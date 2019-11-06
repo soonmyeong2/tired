@@ -1,5 +1,8 @@
 # 피곤하쥬?
 
+## 기간
+19.10.30 ~ 19.12.xx
+
 ## Discription
 
 ‘피곤하쥬?’ 시스템은 강의실 내 강의자의 수업 내용을 녹음 및 분석하고, 이를 텍스트화하여 서버에 저장한다. <br>
@@ -8,4 +11,4 @@
 
 ## Architecture Diagram
 
-![image](/uploads/f827e6fb54f209bcc25c16cb91394d93/image.png)
+![image](https://user-images.githubusercontent.com/38336997/68297437-447af200-00da-11ea-8410-00f70cd92976.png)
