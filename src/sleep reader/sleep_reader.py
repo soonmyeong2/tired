@@ -118,6 +118,9 @@ while True:
 cv2.destroyAllWindows()
 cap.release()
 
+# end of sleep exception
+if len(sleep_times)%2 : sleep_times.append('9999')
+
 print(sleep_times)
 calculateNextDay(sleep_times)
 calculateDupTime(sleep_times, len(sleep_times) - 2)
