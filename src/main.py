@@ -1,4 +1,7 @@
 import argparse
+from sleep_reader import SleepReader
+from time_parser import TimeParser
+from dynamoDB_API import dynamoDB_API
 
 
 def main():
@@ -7,16 +10,17 @@ def main():
     parser.add_argument('email', type=str, help="Input email")
     args = parser.parse_args()
 
-    #direct = Path(os.path.expanduser('~'))
-    #file_path = direct / args.img_file
-    #img = cv2.imread(str(file_path))
+    sleep_reader = SleepReader()
+    sleep_reader.run()
+    sleep_times = sleep_reader.getSleepTime()
+
+    times = TimeParser(sleep_times)
+    times.calculateNextDay()
+    times.calculateDupTime()
+    times.timeParsing()
+    data = times.getTime()
+
     
-    #print(" #pirnt image file path : " + str(file_path)) 
-    
-    #if args.option:
-    #    select_freset(args.option, img)
-    #else:
-    #    default_freset(args.natural, args.noise, args.text_boxes, img)
 
 
 if __name__ == "__main__":

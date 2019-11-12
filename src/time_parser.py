@@ -42,13 +42,3 @@ class TimeParser:
 
     def getTime(self):
         return self.time
-
-
-t = TimeParser(['1234','2345','2345','2347','2355','2377','2388'])
-print(t.getTime())
-t.calculateNextDay()
-print(t.getTime())
-t.calculateDupTime()
-print(t.getTime())
-print(t.timeParsing())
-print(t.getTime())

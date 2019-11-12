@@ -100,7 +100,3 @@ class SleepReader:
     def getSleepTime(self):
         return self.sleep_times
     
-
-#a =SleepReader()
-#a.run()
-#print(a.getSleepTime())
