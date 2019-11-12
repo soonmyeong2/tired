@@ -1,4 +1,4 @@
-requests==2.18.4
+requests==2.20.0
 imutils==0.4.6
 dlib==19.7.0
 opencv-python==3.4.1.15
