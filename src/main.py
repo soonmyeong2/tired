@@ -20,7 +20,7 @@ def main():
     times.timeParsing()
     data = times.getTime()
 
-    
+    print(data)
 
 
 if __name__ == "__main__":
