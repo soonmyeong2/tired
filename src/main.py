@@ -1,7 +1,7 @@
 import argparse
 from sleep_reader import SleepReader
 from time_parser import TimeParser
-from dynamoDB_API import dynamoDB_API
+from dynamoDB_API import tiredDB_API
 
 
 def main():
@@ -17,10 +17,12 @@ def main():
     times = TimeParser(sleep_times)
     times.calculateNextDay()
     times.calculateDupTime()
-    times.timeParsing()
-    data = times.getTime()
+    data = times.timeParsing()
 
     print(data)
+
+    DB = tiredDB_API(args.course_key, args.email, data)
+    DB.post()
 
 
 if __name__ == "__main__":

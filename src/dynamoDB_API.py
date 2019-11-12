@@ -2,7 +2,7 @@ import requests
 import json
 
 
-class dynamoDB_API:
+class tiredDB_API:
     def __init__(self, course_key, email, sleep_times):
 
         with open('API_key.json') as json_file:
@@ -16,10 +16,9 @@ class dynamoDB_API:
         
         self.data = {
             "key": self.course_key,
-            "sleeptime": self.email,
-            "email": self.sleep_times
+            "sleeptime": self.sleep_times,
+            "email": self.email
             }
-
         self.headers = {
             'x-api-key': self.key,
             'Content-Type': 'application/json'
@@ -29,8 +28,3 @@ class dynamoDB_API:
     def post(self):
         res = requests.post(self.URL, headers=self.headers, data=json.dumps(self.data))        
         print(res.status_code, res.reason)
-
-        
-
-a = dynamoDB_API("123value123","14201430/16301640/17001710","test@gmai1l.net")
-a.post()
