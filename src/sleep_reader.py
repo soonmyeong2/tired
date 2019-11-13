@@ -4,6 +4,8 @@ import queue
 import time
 import dlib
 import cv2
+from realtime_graph import MakeGraph
+
 
 class SleepReader:
     def __init__(self):
@@ -25,6 +27,9 @@ class SleepReader:
         for _ in range(50) : self.eyes_meter.put(self.factor)
         # for debug
         self.debug = 0
+
+        # for graph
+        self.graph = MakeGraph([x for x in range(50)], [self.factor]*50, self.factor)
         
 
     # img overlay
@@ -44,6 +49,8 @@ class SleepReader:
 
 
     def run(self):
+        sleep = 0
+        
         while True:
             ret, frame = self.cap.read()
             frame = cv2.flip(frame, 1)
@@ -76,6 +83,7 @@ class SleepReader:
                 self.factor -= self.eyes_meter.get() / (self.eyes_meter.qsize() + 1)
                 self.eyes_meter.put(0.25)
                 self.factor += 0.25 / self.eyes_meter.qsize()
+                sleep = 0
 
             if self.factor <= 0.26: # sleeing
                 h, w, _ = frame.shape
@@ -84,9 +92,11 @@ class SleepReader:
             else:
                 if len(self.sleep_times)%2 : self.sleep_times.append(time.strftime('%H%M', time.localtime(time.time())))
 
-            print(self.debug, self.factor)
-            self.debug += 1
-
+            ## visual code
+            #print(self.debug, self.factor)
+            #self.debug += 1
+            #self.graph.makeDraw(sleep, self.factor)
+            
             cv2.imshow("Frame", frame)
             key = cv2.waitKey(1) & 0xFF
 
