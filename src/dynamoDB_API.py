@@ -1,5 +1,6 @@
 import requests
 import json
+from datetime import datetime, timedelta
 
 
 class tiredDB_API:
@@ -10,12 +11,13 @@ class tiredDB_API:
 
         self.key = API_data["key"]
         self.URL = API_data["URL"]
+        
         self.course_key = course_key
         self.email = email
         self.sleep_times = sleep_times
         
         self.data = {
-            "key": self.course_key,
+            "key": self.course_key + str(datetime.now().year).replace("20", "_") + str(datetime.now().month) + str(datetime.now().day),
             "sleeptime": self.sleep_times,
             "email": self.email
             }

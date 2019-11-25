@@ -29,7 +29,7 @@ class SleepReader:
         self.debug = 0
 
         # for graph
-        self.graph = MakeGraph([x for x in range(50)], [self.factor]*50, self.factor)
+        #self.graph = MakeGraph([x for x in range(50)], [self.factor]*50, self.factor)
         
 
     # img overlay
