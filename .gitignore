@@ -1,3 +1,4 @@
 /src/etc/shape_predictor_68_face_landmarks.dat
 /src/__pycache__
 /src/API_key.json
+/src/audio2S3/AWS_key.json
