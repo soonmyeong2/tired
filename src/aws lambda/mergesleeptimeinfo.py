@@ -40,15 +40,19 @@ def check(response):
         
 def lambda_handler(event, context):
     
-    bucket_name=event['Records'][0]['s3']['bucket']['name']
-    key_path=event['Records'][0]['s3']['object']['key']
-    if bucket_name!='tired-bucket' or key_path[:3]=='pre':
+    message = json.loads(event['Records'][0]['Sns']['Message'])
+    bucket_name = message['Records'][0]['s3']['bucket']['name']
+    key_path = message['Records'][0]['s3']['object']['key']
+    
+    #tired-bucket/raw/에 업로드 되었을 때만 merge
+    if bucket_name!='tired-bucket' or key_path[:3]!='raw':
         return{
             'statusCode': 200,
             'body': json.dumps('Not Applicable')
         }
         
-    key=key_path[-19:-13]
+    #coursekey CSE000_191125.13301415.mp3
+    key=key_path[-26:-13]
     
     dynamodb=boto3.resource('dynamodb')
     table=dynamodb.Table('tired-sleeptime')
@@ -63,12 +67,12 @@ def lambda_handler(event, context):
     table_merge.put_item(
         Item={
             'key':key,
-            'sleeptime':sstmerge
+            'sleeptime':sstmerge,
+            'key_path':key_path
         })
     
     # TODO implement
     return {
         'statusCode': 200,
-        'body': json.dumps('ADDED TO DATABASE'),
-        'response':response
+        'body': json.dumps('ADDED TO DATABASE')
     }
