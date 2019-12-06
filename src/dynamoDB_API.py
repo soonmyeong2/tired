@@ -17,7 +17,7 @@ class tiredDB_API:
         self.sleep_times = sleep_times
         
         self.data = {
-            "key": self.course_key + str(datetime.now().year).replace("20", "_") + str(datetime.now().month) + str(datetime.now().day),
+            "key": self.course_key + str(datetime.now().year).replace("20", "_") + str(datetime.now().month).rjust(2, '0') + str(datetime.now().day).rjust(2, '0'),
             "sleeptime": self.sleep_times,
             "email": self.email
             }
