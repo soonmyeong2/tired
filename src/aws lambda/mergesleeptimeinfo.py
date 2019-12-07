@@ -2,11 +2,46 @@ import json
 import boto3
 from boto3.dynamodb.conditions import Key
 
-def check(response):
-    
+def check(response, table, course_end_time):
     total=[]
+    updateb=False
+    item=[]
+    
+    #splitsleeptime 불러오기
     for i in response['Items']:
-        total.extend(i['splitsleeptime'])
+        sstitem=i['splitsleeptime']
+        
+        for j in sstitem:
+            time=j
+            time=int(time)
+        
+            #sleeptime이 9999면 강의끝시간으로 변경
+            if (int(time)%10000) == 9999:
+                time-=(9999-course_end_time)
+                updateb=True
+            
+            item.append(time)
+            total.append(time)
+            
+        if updateb:
+            table.update_item(
+                Key={
+                    'key':i['key'],
+                    'email':i['email']
+                },
+                UpdateExpression="set sleeptime = :s, splitsleeptime = :l",
+                ExpressionAttributeValues={
+                    ':s':i['sleeptime'],
+                    ':l':item
+                },
+                ReturnValues="UPDATED_NEW"
+            )
+            updateb=False
+        item=[]
+            
+    return total
+        
+def sleeptimemerge(total):
     total.sort()
     result=[]
     
@@ -37,7 +72,7 @@ def check(response):
             result.append(mid_f*10000+mid_l)
             
     return result
-        
+    
 def lambda_handler(event, context):
     
     message = json.loads(event['Records'][0]['Sns']['Message'])
@@ -53,6 +88,7 @@ def lambda_handler(event, context):
         
     #coursekey CSE000_191125.13301415.mp3
     key=key_path[-26:-13]
+    course_end_time=int(key_path[-8:-4])
     
     dynamodb=boto3.resource('dynamodb')
     table=dynamodb.Table('tired-sleeptime')
@@ -61,13 +97,16 @@ def lambda_handler(event, context):
         KeyConditionExpression=Key('key').eq(key)
     )
     
+    #9999 예외처리, 전체 수면시간 list 생성
+    sst_total=check(response, table, course_end_time)
+    #전체 수면시간 merge
+    sst_merge=sleeptimemerge(sst_total)
+    
     table_merge=dynamodb.Table('tired-sleeptimemerge')
-    sstmerge=check(response)
-        
     table_merge.put_item(
         Item={
             'key':key,
-            'sleeptime':sstmerge,
+            'sleeptime':sst_merge,
             'key_path':key_path
         })
     
