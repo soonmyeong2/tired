@@ -2,6 +2,7 @@ import pyaudio
 import wave
 import boto3
 import json
+import time
 
 with open('AWS_key.json') as json_file:
     AWS_key = json.load(json_file) #key, URL
@@ -53,4 +54,12 @@ def record_voice():
 
 def upload_s3():
     s3 = boto3.client('s3', aws_access_key_id=key, aws_secret_access_key=secret_key)
+    # upload format CSE000_191206.13301415.mp3
+
+    # 동기화를 위한 delay
+    print('업로드 중입니다... ', end = '')
+    for i in range(5, -1, -1):
+        time.sleep(1)
+        print('{0}.. '.format(i), end ='')
+
     s3.upload_file(WAVE_OUTPUT_FILENAME, 'tired-bucket', 'CSE000_191130')
