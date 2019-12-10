@@ -2,3 +2,7 @@
 /src/__pycache__
 /src/API_key.json
 /src/audio2S3/AWS_key.json
+/src/mfcc/data/*
+/src/mfcc/npy/*
+/src/mfcc/wav/*
+/src/mfcc/python_speech_features/__pycache__
