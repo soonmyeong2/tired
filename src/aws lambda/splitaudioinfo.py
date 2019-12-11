@@ -55,7 +55,7 @@ def lambda_handler(event, context):
             splitsound.export('/tmp/output_file.mp3', format="mp3")
             #check last audio file 
             if (j+2)==len(splitsleeptime):
-                s3.upload_file('/tmp/output_file.mp3',bucket, 'preprocessed/'+key+'.'+str(splitsleeptime_real[j])+str(splitsleeptime_real[j+1])+'@.mp3')
+                s3.upload_file('/tmp/output_file.mp3',bucket, 'preprocessed/'+key+'.'+str(splitsleeptime_real[j])+str(splitsleeptime_real[j+1])+'Z.mp3')
             else:
                 s3.upload_file('/tmp/output_file.mp3',bucket, 'preprocessed/'+key+'.'+str(splitsleeptime_real[j])+str(splitsleeptime_real[j+1])+'.mp3')
     

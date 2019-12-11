@@ -9,6 +9,13 @@ def lambda_handler(event, context):
     
     sst=list(map(int,sleeptime.split('/')))
     
+    for i in sst:
+        ii=int(i/10000)
+        il=i%10000
+        
+        if ii==il:
+            sst.remove(i)
+    
     dynamodb=boto3.resource('dynamodb')
     table=dynamodb.Table('tired-sleeptime')
     
