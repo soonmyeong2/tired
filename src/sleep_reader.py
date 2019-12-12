@@ -27,7 +27,7 @@ class SleepReader:
         for _ in range(50) : self.eyes_meter.put(self.factor)
         # for debug
         self.debug = 0
-
+        
         # for graph
         #self.graph = MakeGraph([x for x in range(50)], [self.factor]*50, self.factor)
         
@@ -50,12 +50,16 @@ class SleepReader:
 
     def run(self):
         sleep = 0
-        
+        (lStart, lEnd) = face_utils.FACIAL_LANDMARKS_IDXS["left_eye"]
+        (rStart, rEnd) = face_utils.FACIAL_LANDMARKS_IDXS["right_eye"]
+
         while True:
             ret, frame = self.cap.read()
             frame = cv2.flip(frame, 1)
             gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
             rects = self.detector(gray, 0)
+            h, w, _ = frame.shape  # foreground
+        
 
             # If there is a detected face
             for rect in rects:
@@ -63,18 +67,27 @@ class SleepReader:
                 shape = face_utils.shape_to_np(shape)
                 # Ratio between eyes
                 sleep = 0
+                leftEye = shape[lStart:lEnd]
+                rightEye = shape[rStart:rEnd]
+
+		
+                leftEyeHull = cv2.convexHull(leftEye)
+                rightEyeHull = cv2.convexHull(rightEye)
+                cv2.drawContours(frame, [leftEyeHull], -1, (0, 255, 0), 1)
+                cv2.drawContours(frame, [rightEyeHull], -1, (0, 255, 0), 1)
 
                 for eye in self.eyes:
-                    cv2.circle(frame, (int((shape[eye[0]][0]+shape[eye[1]][0])/2),\
-                                       int((shape[eye[0]][1]+shape[eye[1]][1])/2)), 1, (0, 255, 255), -1)
-                    cv2.circle(frame, (int((shape[eye[2]][0]+shape[eye[3]][0])/2),\
-                                       int((shape[eye[2]][1]+shape[eye[3]][1])/2)), 1, (0, 255, 255), -1)
                     sleep += ((shape[eye[3]][1]+shape[eye[2]][1])/2 - (shape[eye[1]][1]+shape[eye[0]][1])/2)\
                                     / (shape[33][1] - shape[28][1])
-
+                    
                 self.factor -= self.eyes_meter.get() / (self.eyes_meter.qsize() + 1) # queue lost size by 1
                 self.eyes_meter.put(sleep)
                 self.factor += sleep / self.eyes_meter.qsize()
+
+                
+                # factor 출력
+                cv2.putText(frame, "Factor: {:.2f}".format(self.factor), (w-200, 30),\
+                                cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
 
                 #if factor <= 0.26: # future features on face
                     #transparentOverlay(frame, img, shape[27])
@@ -86,8 +99,9 @@ class SleepReader:
                 sleep = 0
 
             if self.factor <= 0.26: # sleeing
-                h, w, _ = frame.shape
-                self.transparentOverlay(frame, self.img, (int(w/2)+random.randrange(1, 11), int(h/2)+random.randrange(1, 11)))
+                # 존다는 메세지 출력
+                cv2.putText(frame, "Sleep !", (100, 30),\
+                                cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
                 if len(self.sleep_times)%2 == 0 : self.sleep_times.append(time.strftime('%H%M', time.localtime(time.time())))
             else:
                 if len(self.sleep_times)%2 : self.sleep_times.append(time.strftime('%H%M', time.localtime(time.time())))
