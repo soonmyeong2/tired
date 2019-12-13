@@ -67,15 +67,25 @@ def lambda_handler(event, context):
                     start_t=i_f*60-60 # json파일 내에서 사용자의 수면시작시간(상대시간)
                     end_t=i_l*60+60 # json파일 내에서 사용자의 수면종료시간
                     json_new = {"results":{"items":[], "status":"COMPLETED"}}
-                    for j in json_items:
+                    writemore = False
+                    for j in json_items: # item을 하나씩 체크
                         word_type = j.get("type")
                         if word_type == "pronunciation":
                             a = int(float(j.get("start_time")))
                             b = int(float(j.get("end_time")))
                             if start_t <= a and end_t >= b:
                                 json_new['results']['items'].append(j)
-                        else: 
-                            json_new['results']['items'].append(j)
+                                writemore = True
+                            #elif start_t > a:
+                                #writemore = False
+                            elif end_t < b:
+                                break
+                        else:
+                            if writemore == True:
+                                json_new['results']['items'].append(j)
+                            else:
+                                continue
+                            
                     with open('/tmp/'+filename, 'w', encoding='utf-8') as f:
                         json.dump(json_new, f, ensure_ascii=False, indent=4)
                     #json.dump(json_new, jsonfile, ensure_ascii = False)
