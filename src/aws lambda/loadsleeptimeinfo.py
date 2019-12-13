@@ -27,6 +27,7 @@ def lambda_handler(event, context):
         }
         
     s3_obj = boto3.client('s3') # 객체를 s3로 선언
+    s3r=boto3.resource('s3')
     dynamodb=boto3.resource('dynamodb') # 객체를 dynamodb로 선언
     table=dynamodb.Table('tired-sleeptime') # 테이블 선언
 
@@ -46,7 +47,7 @@ def lambda_handler(event, context):
             json_data = json.loads(s3_clientobj['Body'].read().decode('utf-8'))
             json_results = json_data['results']
             json_items = json_data['results']['items']
-            json_new = {"results":{"items":[], "status":"COMPLETED"}}
+            
             time = int(key[14:22]) #13321339
             time_f=int(time/10000) # merged파일(content)의 시작 시간 (절대시간) // 1332
             time_l=int(time%10000) # merged파일(content)의 종료 시간 (절대시간) // 1339
@@ -55,7 +56,7 @@ def lambda_handler(event, context):
                 sst = db_item['splitsleeptime'] # json파일 분할에 쓸 사용자 수면시간 지정 (리스트)
                 #상대시간 계산. milliseconds
                 filename = course_key+email+'.json' # 파일명: 학수번호/날짜/이메일.json
-                jsonfile = open('/tmp/'+filename, mode='wt') # 임시 새 json파일 open
+                #jsonfile = open('/tmp/'+filename, mode='wt') # 임시 새 json파일 open
                 for i in sst: # sst 리스트에 있는 sleeptime들을 모두 제어해줘야함
                     i_f=int(i/10000) # 졸기시작한 절대시간 
                     i_l=i%10000 # 졸음 끝난 절대시간
@@ -65,6 +66,7 @@ def lambda_handler(event, context):
                     i_l=(i_l-time_f-40*time_t_hour)
                     start_t=i_f*60-60 # json파일 내에서 사용자의 수면시작시간(상대시간)
                     end_t=i_l*60+60 # json파일 내에서 사용자의 수면종료시간
+                    json_new = {"results":{"items":[], "status":"COMPLETED"}}
                     for j in json_items:
                         word_type = j.get("type")
                         if word_type == "pronunciation":
@@ -74,7 +76,13 @@ def lambda_handler(event, context):
                                 json_new['results']['items'].append(j)
                         else: 
                             json_new['results']['items'].append(j)
-                    json.dump(json_new, jsonfile, ensure_ascii = False)
+                    with open('/tmp/'+filename, 'w', encoding='utf-8') as f:
+                        json.dump(json_new, f, ensure_ascii=False, indent=4)
+                    #json.dump(json_new, jsonfile, ensure_ascii = False)
+                    print(json_new)
+                    with open('/tmp/'+filename, encoding='utf-8') as json_file:
+                        dodo = json.load(json_file)
+                    print(dodo)
                     s3_obj.upload_file('/tmp/'+filename, bucket, 'userjson/'+filename)
 #
     # TODO implement
