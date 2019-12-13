@@ -3,6 +3,8 @@ import wave
 import boto3
 import json
 import time
+from pydub import AudioSegment
+
 
 with open('AWS_key.json') as json_file:
     AWS_key = json.load(json_file) #key, URL
@@ -16,7 +18,7 @@ FORMAT = pyaudio.paInt16
 CHANNELS = 1
 RATE = 44100
 RECORD_SECONDS = 10
-WAVE_OUTPUT_FILENAME = "output.wav"
+WAVE_OUTPUT_FILENAME = "output.mp3"
 
 
 def record_voice():
@@ -53,13 +55,14 @@ def record_voice():
 
 
 def upload_s3():
-    s3 = boto3.client('s3', aws_access_key_id=key, aws_secret_access_key=secret_key)
-    # upload format CSE000_191206.13301415.mp3
+    file_name = input("file name : ")
 
     # 동기화를 위한 delay
     print('업로드 중입니다... ', end = '')
-    for i in range(5, -1, -1):
+    for i in range(5, 0, -1):
         time.sleep(1)
         print('{0}.. '.format(i), end ='')
+    s3=boto3.resource('s3', aws_access_key_id=key, aws_secret_access_key=secret_key)
+    s3.Object('tired-bucket', 'raw/'+file_name).put(Body=open(WAVE_OUTPUT_FILENAME,'rb'))
 
-    s3.upload_file(WAVE_OUTPUT_FILENAME, 'tired-bucket', 'CSE000_191130')
+upload_s3()

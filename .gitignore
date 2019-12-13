@@ -6,3 +6,4 @@
 /src/mfcc/npy/*
 /src/mfcc/wav/*
 /src/mfcc/python_speech_features/__pycache__
+src/audio2S3/output.mp3
