@@ -4,6 +4,7 @@ import boto3
 import json
 import time
 from pydub import AudioSegment
+import keyboard
 
 
 with open('AWS_key.json') as json_file:
@@ -17,7 +18,7 @@ CHUNK = 1024
 FORMAT = pyaudio.paInt16
 CHANNELS = 1
 RATE = 44100
-RECORD_SECONDS = 10
+#RECORD_SECONDS = 10
 WAVE_OUTPUT_FILENAME = "output.mp3"
 
 
@@ -30,11 +31,14 @@ def record_voice():
                     input=True,
                     frames_per_buffer=CHUNK)
 
-    print("Start to record the audio.")
+    print("Start to record the audio.\nEnter 'q' to end recording.")
 
     frames = []
 
-    for i in range(0, int(RATE / CHUNK * RECORD_SECONDS)):
+    #for i in range(0, int(RATE / CHUNK * RECORD_SECONDS)):
+    while True:
+        if keyboard.is_pressed('q'):
+            break
         data = stream.read(CHUNK)
         frames.append(data)
 
@@ -55,14 +59,16 @@ def record_voice():
 
 
 def upload_s3():
-    file_name = input("file name : ")
+    file_name = input("\nCourse number : ")
 
     # 동기화를 위한 delay
-    print('업로드 중입니다... ', end = '')
+    print('Uploading... ', end = '')
     for i in range(5, 0, -1):
         time.sleep(1)
         print('{0}.. '.format(i), end ='')
     s3=boto3.resource('s3', aws_access_key_id=key, aws_secret_access_key=secret_key)
     s3.Object('tired-bucket', 'raw/'+file_name).put(Body=open(WAVE_OUTPUT_FILENAME,'rb'))
-
+    print("\nComplete.")
+    
+record_voice()
 upload_s3()
