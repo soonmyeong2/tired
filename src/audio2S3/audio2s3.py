@@ -5,6 +5,7 @@ import json
 import time
 from pydub import AudioSegment
 import keyboard
+from datetime import datetime, timedelta
 
 
 with open('AWS_key.json') as json_file:
@@ -20,9 +21,11 @@ CHANNELS = 1
 RATE = 44100
 #RECORD_SECONDS = 10
 WAVE_OUTPUT_FILENAME = "output.mp3"
-
+RECORD_START_TIME = ""
+RECORD_END_TIME = ""
 
 def record_voice():
+    global RECORD_START_TIME, RECORD_END_TIME
     p = pyaudio.PyAudio()
 
     stream = p.open(format=FORMAT,
@@ -32,6 +35,7 @@ def record_voice():
                     frames_per_buffer=CHUNK)
 
     print("Start to record the audio.\nEnter 'q' to end recording.")
+    RECORD_START_TIME = str(datetime.now().hour).rjust(2, "0")+ str(datetime.now().minute).rjust(2, "0")
 
     frames = []
 
@@ -43,11 +47,11 @@ def record_voice():
         frames.append(data)
 
     print("Recording is finished.")
+    RECORD_END_TIME = str(datetime.now().hour).rjust(2, "0")+ str(datetime.now().minute).rjust(2, "0")
 
     stream.stop_stream()
     stream.close()
     p.terminate()
-
 
     ### output file 
     wf = wave.open(WAVE_OUTPUT_FILENAME, 'wb')
@@ -59,8 +63,16 @@ def record_voice():
 
 
 def upload_s3():
+    # CSE000_191125.13301410.mp3
     file_name = input("\nCourse number : ")
-
+    file_name += str(datetime.now().year).replace("20", "_")\
+                 + str(datetime.now().month).rjust(2, '0')\
+                 + str(datetime.now().day).rjust(2, '0')\
+                 + "."\
+                 + RECORD_START_TIME\
+                 + RECORD_END_TIME\
+                 + ".mp3"
+                 
     # 동기화를 위한 delay
     print('Uploading... ', end = '')
     for i in range(5, 0, -1):
