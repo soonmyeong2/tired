@@ -28,5 +28,12 @@ class tiredDB_API:
 
 
     def post(self):
-        res = requests.post(self.URL, headers=self.headers, data=json.dumps(self.data))        
+        res = requests.post(self.URL, headers=self.headers, data=json.dumps(self.data))
+        '''
+        if res.status_code == '429':
+            for _ in range(5):
+                res = requests.post(self.URL, headers=self.headers, data=json.dumps(self.data))
+                sleep(10)
+        '''
+                
         print(res.status_code, res.reason)
