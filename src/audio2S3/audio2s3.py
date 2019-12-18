@@ -72,7 +72,9 @@ def upload_s3():
                  + RECORD_START_TIME\
                  + RECORD_END_TIME\
                  + ".mp3"
-                 
+
+    if file_name[0] == 'q' : file_name = file_name[1:]
+    
     # 동기화를 위한 delay
     print('Uploading... ', end = '')
     for i in range(5, 0, -1):
