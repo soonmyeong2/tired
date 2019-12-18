@@ -50,11 +50,27 @@ def lambda_handler(event, context):
         print(bucket,keypath)
         s3.download_file(bucket, keypath, '/tmp/input_file.mp3')
         #s3r.Object(bucket,keypath).download_file('/tmp/input_file.mp3')
+
         sound=AudioSegment.from_mp3('/tmp/input_file.mp3')
         #sound=AudioSegment.from_file('/tmp/input_file.mp3', format='mp3')
+        
+        
+        # merge sleep audio file _YW
+        merge_sleep_sound = AudioSegment.empty()
+        for j in range(0,len(splitsleeptime),2):
+            merge_sleep_sound += sound[splitsleeptime[j]*6:splitsleeptime[j+1]*6]
+        #merge_sleep_sound.export('/tmp/output_merge_audio.mp3', format="mp3")
+        
+        for i in range(len(merge_sleep_sound)//(1000*60)):
+            split_audio = merge_sleep_sound[i*1000*60:(i+1)*1000*60]
+            split_audio.export('/tmp/sage_file'+str(i)+'.wav', format="wav")
+            s3r.Object('sagemaker-tired','sleep_wav_file/'+ key+'.'+str(i)+'.wav').put(Body=open('/tmp/sage_file'+str(i)+'.wav','rb')) # YW
+        # end _YW
+        
         for j in range(0,len(splitsleeptime),2):
             splitsound=sound[splitsleeptime[j]*6:splitsleeptime[j+1]*6]
             splitsound.export('/tmp/output_file.mp3', format="mp3")
+            
             #check last audio file 
             if (j+2)==len(splitsleeptime):
                 s3r.Object(bucket,'preprocessed/'+key+'.'+str(splitsleeptime_real[j])+str(splitsleeptime_real[j+1])+'Z.mp3').put(Body=open('/tmp/output_file.mp3','rb'))
@@ -62,7 +78,7 @@ def lambda_handler(event, context):
             else:
                 s3r.Object(bucket,'preprocessed/'+key+'.'+str(splitsleeptime_real[j])+str(splitsleeptime_real[j+1])+'.mp3').put(Body=open('/tmp/output_file.mp3','rb'))
                 #s3.upload_file('/tmp/output_file.mp3',bucket, 'preprocessed/'+key+'.'+str(splitsleeptime_real[j])+str(splitsleeptime_real[j+1])+'.mp3')
-    
+
     # TODO implement
     return {
         'statusCode': 200,
