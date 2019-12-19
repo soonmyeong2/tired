@@ -34,9 +34,20 @@ def lambda_handler(event, context):
         splitsleeptime_real=[]
 
         for j in sleeptime:
+            i_ff=int(int(j)/10000)
+            if (i_ff<1000):
+                splitsleeptime_real.extend(['0'+str(i_ff)])
+            else:
+                splitsleeptime_real.extend([str(i_ff)])
+            i_ll=int(int(j)%10000)
+            if (i_ll<1000):
+                splitsleeptime_real.extend(['0'+str(i_ll)])
+            else:
+                splitsleeptime_real.extend([str(i_ll)])
+                
+            
             i_f=int(int(j)/10000)
             i_l=int(int(j)%10000)
-            splitsleeptime_real.extend([i_f, i_l])
             
             #save class period
             time_t_hour=int(i_f/100)-int(time_f/100)
@@ -48,12 +59,11 @@ def lambda_handler(event, context):
             
         #print(splitsleeptime, splitsleeptime_real)
         print(bucket,keypath)
-        s3.download_file(bucket, keypath, '/tmp/input_file.mp3')
+        s3.download_file(bucket, keypath, "/tmp/input_file.wav")
         #s3r.Object(bucket,keypath).download_file('/tmp/input_file.mp3')
-
-        sound=AudioSegment.from_mp3('/tmp/input_file.mp3')
-        #sound=AudioSegment.from_file('/tmp/input_file.mp3', format='mp3')
         
+        #sound=AudioSegment.from_mp3("/tmp/input_file.wav")
+        sound=AudioSegment.from_file("/tmp/input_file.wav", "wav")
         
         # merge sleep audio file _YW
         merge_sleep_sound = AudioSegment.empty()

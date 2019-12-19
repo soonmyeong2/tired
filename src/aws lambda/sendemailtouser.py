@@ -88,8 +88,8 @@ def lambda_handler(event, context):
                 raw_key_path=content.get('Key')
         print(raw_key_path)
         ssst=splitlist(dbresponse['Item']['splitsleeptime'],int(raw_key_path[-12:-4]))
-        s3.download_file('tired-bucket', raw_key_path, '/tmp/input_file.mp3')
-        sound=AudioSegment.from_mp3('/tmp/input_file.mp3')
+        s3.download_file('tired-bucket', raw_key_path, '/tmp/input_file.wav')
+        sound=AudioSegment.from_file('/tmp/input_file.wav', 'wav')
         
         splitsound=sound[ssst[0]*6:ssst[1]*6]
         print((ssst[0]*6), (ssst[1]*6))
