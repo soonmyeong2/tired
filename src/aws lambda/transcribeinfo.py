@@ -34,7 +34,8 @@ def lambda_handler(event, context):
             elif(job_name[-1] == 'Z'):
                 last_job = job_name
                 break
-            job_uri = "s3://"+bucket_name+"/preprocessed/"+job_obj+".mp3"
+            #job_uri = "s3://"+bucket_name+"/preprocessed/"+job_obj+".mp3"
+            job_uri = "s3://"+bucket_name+ "/" +job_obj
             transcribe.start_transcription_job(
             TranscriptionJobName= job_name,
             Media={'MediaFileUri': job_uri},
@@ -53,6 +54,7 @@ def lambda_handler(event, context):
             time.sleep(5) # 5초 후 다시 체크
     transcribe = boto3.client('transcribe')
     job_uri = "s3://"+bucket_name+"/preprocessed/"+last_job+".mp3"
+    #job_uri = "s3://"+bucket_name+"/preprocessed/"+last_job+".mp3"
     print(last_job, job_uri)
     transcribe.start_transcription_job(
         TranscriptionJobName = last_job,
